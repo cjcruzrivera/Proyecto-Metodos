@@ -77,9 +77,11 @@ def independent_cascade(G, seeds, steps=0):
 
   # init activation probabilities
   for e in DG.edges():
+    print(DG[e[0]][e[1]])
     if 'act_prob' not in DG[e[0]][e[1]]:
       DG[e[0]][e[1]]['act_prob'] = DG[e[0]][e[1]]['weight']
-    elif DG[e[0]][e[1]]['act_prob'] > 1:
+      
+    elif DG[e[0]][e[1]]['act_prob'] >  1:
       raise Exception("edge activation probability:", \
           DG[e[0]][e[1]]['act_prob'], "cannot be larger than 1")
 
@@ -154,7 +156,7 @@ def buildG(G, file_, delimiter_):
            if len(line) >  2:
               if float(line[2]) != 0.0:
                 #line format: u,v,w
-                G.add_edge(int(line[0]),int(line[1]),weight=float(line[2]))
+                G.add_edge(int(line[0]),int(line[1]),weight=float(line[2]), dato_r = "hola",act_prob=float(line[2]))
            else:
             #line format: u,v
                G.add_edge(int(line[0]),int(line[1]),weight=1.0)
@@ -181,6 +183,7 @@ def main(argv):
     while inisi == 0: inisi = random.randrange(n)
     print(inisi)
     diffusion = independent_cascade(G, [4], steps = 0)
+    diffusion2 = independent_cascade(G, [1], steps = 0)
     print(diffusion)
    
     print (time.strftime("%I:%M:%S"))
@@ -200,7 +203,7 @@ def main(argv):
     cont = 1
     for i in G.nodes():
         colr = float(cont)/n
-        nx.draw_networkx_nodes(G, pos, [i] , node_size = 100, node_color = 'w', with_labels=True)
+        nx.draw_networkx_nodes(G, pos, [i] , node_size = 100, node_color = 'w',  with_labels=True)
         labels[i] = i
         cont += 1
     nx.draw_networkx_labels(G,pos,labels,font_size=5)        
@@ -217,32 +220,32 @@ def main(argv):
     infect.append(infectados)
     sucep.append(sanos)
     tics.append(conts)
-
-    for i in diffusion:
+    for x in range ( 0, len(diffusion)):
         #print(i)
-        infectados = infectados + len(i)
-        sanos = sanos - len(i)
+        infectados = infectados + len(diffusion[x])
+        sanos = sanos - len(diffusion[x])
         infect.append(infectados)
         sucep.append(sanos)
         conts = conts + 1
         tics.append(conts)
         #plt.pause(0.001)
-        nx.draw_networkx_nodes(G, pos, i , node_size = 250, node_color = 'r', with_labels=True)
+        nx.draw_networkx_nodes(G, pos, diffusion[x] , node_size = 250, node_color = 'r', with_labels=True)
+        nx.draw_networkx_nodes(G, pos, diffusion2[x] , node_size = 250, node_color = 'b', with_labels=True)
         plt.pause(1)
         plt.draw()
- 
+    plt.pause(20)
     plt.subplot(2,2,1)
     plt.title('suceptibles')
-    plt.xlabel('')
+    plt.xlabel('Tics')
     plt.ylabel('Nodos')
     plt.plot(tics,sucep,'r')
     plt.subplot(2,2,2)
-    plt.title('Convencidos')
+    plt.title('infectados')
     plt.xlabel('Tics')
     plt.ylabel('Nodos')
     plt.plot(tics,infect,'g')
     plt.subplot(2,2,3)
-    plt.title('Convencidos y Suceptibles')
+    plt.title('infectados y Suceptibles')
     plt.xlabel('Tics')
     plt.ylabel('Nodos')
     plt.plot(tics,sucep)
@@ -250,7 +253,7 @@ def main(argv):
     plt.show()
 
    
-    plt.pause(10)
+    plt.pause(20)
     # Animator call
     #anim = animation.FuncAnimation(fig, animate, frames=20, interval=20, blit=True)
     print(infect,sucep,tics)    
