@@ -78,7 +78,7 @@ def independent_cascade(G, seeds, steps=0):
   # init activation probabilities
   for e in DG.edges():
     if 'act_prob' not in DG[e[0]][e[1]]:
-      DG[e[0]][e[1]]['act_prob'] = 1
+      DG[e[0]][e[1]]['act_prob'] = DG[e[0]][e[1]]['weight']
     elif DG[e[0]][e[1]]['act_prob'] > 1:
       raise Exception("edge activation probability:", \
           DG[e[0]][e[1]]['act_prob'], "cannot be larger than 1")
@@ -233,16 +233,16 @@ def main(argv):
  
     plt.subplot(2,2,1)
     plt.title('suceptibles')
-    plt.xlabel('Tics')
+    plt.xlabel('')
     plt.ylabel('Nodos')
     plt.plot(tics,sucep,'r')
     plt.subplot(2,2,2)
-    plt.title('infectados')
+    plt.title('Convencidos')
     plt.xlabel('Tics')
     plt.ylabel('Nodos')
     plt.plot(tics,infect,'g')
     plt.subplot(2,2,3)
-    plt.title('infectados y Suceptibles')
+    plt.title('Convencidos y Suceptibles')
     plt.xlabel('Tics')
     plt.ylabel('Nodos')
     plt.plot(tics,sucep)
