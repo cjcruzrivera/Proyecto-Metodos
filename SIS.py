@@ -77,9 +77,8 @@ def independent_cascade(G, seeds, steps=0):
 
   # init activation probabilities
   for e in DG.edges():
-    print(DG[e[0]][e[1]])
     if 'act_prob' not in DG[e[0]][e[1]]:
-      DG[e[0]][e[1]]['act_prob'] = DG[e[0]][e[1]]['weight']
+      DG[e[0]][e[1]]['act_prob'] = 1
       
     elif DG[e[0]][e[1]]['act_prob'] >  1:
       raise Exception("edge activation probability:", \
@@ -137,12 +136,19 @@ def _diffuse_one_round(G, A, tried_edges):
   return A, activated_nodes_of_this_round, cur_tried_edges
 
 def _prop_success(G, src, dest):
-  return random.random() <= G[src][dest]['act_prob']
+      if (random.random() <= G[src][dest]['act_prob']  and random.random() >= creyentes[dest] ):
+            return True
 
+
+
+
+      
 
 #this method just reads the graph structure from the file
 def buildG(G, file_, delimiter_):
     global Nodospajek
+    global creyentes 
+    creyentes = {}
     Nodospajek = []
     #construct the weighted version of the contact graph from cgraph.dat file
     #reader = csv.reader(open("/home/kazem/Data/UCI/karate.txt"), delimiter=" ")
@@ -152,11 +158,12 @@ def buildG(G, file_, delimiter_):
     for line in reader:
         if Arcos == 0 and  line[0] != "*Arcs" and cont != 0:
             Nodospajek.append(line)
+            creyentes[int(line[0])] = float(line[2])
         if Arcos == 1:
            if len(line) >  2:
               if float(line[2]) != 0.0:
                 #line format: u,v,w
-                G.add_edge(int(line[0]),int(line[1]),weight=float(line[2]), dato_r = "hola",act_prob=float(line[2]))
+                G.add_edge(int(line[0]),int(line[1]),act_prob=float(line[2]))
            else:
             #line format: u,v
                G.add_edge(int(line[0]),int(line[1]),weight=1.0)
@@ -185,7 +192,7 @@ def main(argv):
     diffusion = independent_cascade(G, [4], steps = 0)
     diffusion2 = independent_cascade(G, [1], steps = 0)
     print(diffusion)
-   
+    print(Nodospajek)
     print (time.strftime("%I:%M:%S"))
     #pos = nx.spectral_layout(G)
     #pos = nx.circular_layout(G)
