@@ -10,7 +10,19 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as blt
 import copy
 import matplotlib.animation as animation
+"""
+Religiones:
+0: No religion
+1: Religion catolica
+2: Religion protestante
+"""
 
+
+"""
+
+
+
+"""
 print (time.strftime("%I:%M:%S"))
 
 # Animation funciton
@@ -136,13 +148,27 @@ def _diffuse_one_round(G, A, tried_edges):
   return A, activated_nodes_of_this_round, cur_tried_edges
 
 def _prop_success(G, src, dest):
-      if (random.random() <= G[src][dest]['act_prob']  and random.random() >= creyentes[dest] ):
+      if (random.random() <= G[src][dest]['act_prob']  and 
+      random.random() <= creyentes[src]['grad_transferencia'] and 
+      random.random() <= creyentes[dest]['grad_percepcion']  ): 
             return True
 
 
 
-
       
+class creyente(dict):
+  """
+  id = id del creyente leido de el archivo de texto
+  grad_transferencia: probabilidad de que el nodo desee tratar de convencer a sus vecinos
+  de su religion
+  religion: 0 1 o 2, 0 no tiene 1 catolica, 2 protestante
+  grad_transferencia: probablidad de que desee compartir sus creencias
+  grad_percepcion = probabilidad de que cambie sus creencias por otras
+  """
+  def __init__(self):
+    return None
+  
+
 
 #this method just reads the graph structure from the file
 def buildG(G, file_, delimiter_):
@@ -158,7 +184,12 @@ def buildG(G, file_, delimiter_):
     for line in reader:
         if Arcos == 0 and  line[0] != "*Arcs" and cont != 0:
             Nodospajek.append(line)
-            creyentes[int(line[0])] = float(line[2])
+            creyente_obj = creyente()
+            creyente_obj['religion'] = int(line[4])
+            creyente_obj['grad_transferencia'] = float(line[3])
+            creyente_obj['grad_percepcion'] = float(line[2])
+            creyente_obj['id'] = int(line[0])
+            creyentes[int(line[0])] = creyente_obj  
         if Arcos == 1:
            if len(line) >  2:
               if float(line[2]) != 0.0:
@@ -192,7 +223,7 @@ def main(argv):
     diffusion = independent_cascade(G, [4], steps = 0)
     diffusion2 = independent_cascade(G, [1], steps = 0)
     print(diffusion)
-    print(Nodospajek)
+    print(creyentes)
     print (time.strftime("%I:%M:%S"))
     #pos = nx.spectral_layout(G)
     #pos = nx.circular_layout(G)
