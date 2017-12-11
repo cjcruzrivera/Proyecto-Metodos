@@ -20,10 +20,20 @@ Religiones:
 
 """
 
+La religion catolica al tratar de transferirse no genera ninguna resistencia en quien se va a transferir
+pero sus seguidores tienen un decremento en su grado de transferencia en un 0.7x, y ademas el grado de percepcion
+de otras ideas agenas a su religion se mantiene igual
 
+La religion protestante por su parte genera una resistencia del 1.5x en quien se va a transferir pero genera
+un grado de transferencia del 1.5x, y ademas el grado de percepcion de otras ideas ajenas a su religion disminuye
+a la mitad
 
 """
 print (time.strftime("%I:%M:%S"))
+
+NO_RELIGION = 0
+RELIGION_CATOLICA = 1
+RELIGION_PROTESTANTE = 2
 
 # Animation funciton
 def animate(i):
@@ -147,10 +157,27 @@ def _diffuse_one_round(G, A, tried_edges):
   A.extend(activated_nodes_of_this_round)
   return A, activated_nodes_of_this_round, cur_tried_edges
 
+
+def cambiarse_a_catolica(nodo):
+  creyentes[nodo]['religion'] == RELIGION_CATOLICA
+  creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] * 0.7
+  
+def cambiarse_a_protestante(nodo):
+  creyentes[nodo]['religion'] == RELIGION_PROTESTANTE
+  nuevo_grad_transferencia = creyentes[nodo]['grad_transferencia'] * 1.5
+  nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * 1.5
+  creyentes[nodo]['grad_transferencia'] = nuevo_grad_transferencia if nuevo_grad_transferencia <= 1 else 1 
+  creyentes[nodo]['grad_percepcion'] =   nuevo_grad_percepcion if nuevo_grad_percepcion <= 1 else 1
+
 def _prop_success(G, src, dest):
       if (random.random() <= G[src][dest]['act_prob']  and 
       random.random() <= creyentes[src]['grad_transferencia'] and 
       random.random() <= creyentes[dest]['grad_percepcion']  ): 
+            if(creyentes[src]['religion'] == RELIGION_CATOLICA):
+              cambiarse_a_catolica(dest)
+            if(creyentes[src]['religion'] == RELIGION_PROTESTANTE):
+              cambiarse_a_protestante(dest)
+
             return True
 
 
