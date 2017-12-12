@@ -35,6 +35,9 @@ print (time.strftime("%I:%M:%S"))
 NO_RELIGION = 0
 RELIGION_CATOLICA = 1
 RELIGION_PROTESTANTE = 2
+MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 0.7
+MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE = 1.5
+MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.5
 
 # Animation funciton
 def animate(i):
@@ -186,12 +189,13 @@ def validar_semillas(semillas):
 
 def cambiarse_a_catolica(nodo):
   creyentes[nodo]['religion'] = RELIGION_CATOLICA
-  creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] * 0.7
+  creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] * \
+  MULTIPLICADOR_TRANSFERENCIA_CATOLICA
   
 def cambiarse_a_protestante(nodo):
   creyentes[nodo]['religion'] = RELIGION_PROTESTANTE
-  nuevo_grad_transferencia = creyentes[nodo]['grad_transferencia'] * 1.5
-  nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * 1.5
+  nuevo_grad_transferencia = creyentes[nodo]['grad_transferencia'] * MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE
+  nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * MULTIPLICADOR_PERCEPCION_PROTESTANTE
   creyentes[nodo]['grad_transferencia'] = nuevo_grad_transferencia if nuevo_grad_transferencia <= 1 else 1 
   creyentes[nodo]['grad_percepcion'] =   nuevo_grad_percepcion if nuevo_grad_percepcion <= 1 else 1
 
