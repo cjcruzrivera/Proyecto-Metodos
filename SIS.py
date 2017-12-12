@@ -71,8 +71,8 @@ def configuracion2():
       configuracion_protestantes_muy_poco_perceptivos()
       configuracion_mucha_resistencia_contra_protestantes()
 
-#configuracion1()
-configuracion2()
+configuracion1()
+#configuracion2()
 
 # Animation funciton
 def animate(i):
