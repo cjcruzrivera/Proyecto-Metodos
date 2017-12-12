@@ -5,6 +5,7 @@ import csv
 import random as rand
 import random
 import sys
+import thread
 import time
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as blt
@@ -90,7 +91,7 @@ def independent_cascade(G, seeds, steps=0):
   for s in seeds:
     if s not in G.nodes():
       raise Exception("seed", s, "is not in graph")
-
+  validar_semillas(seeds)
   # change to directed graph
   if not G.is_directed():
     DG = G.to_directed()
@@ -145,18 +146,35 @@ def _diffuse_k_rounds(G, A, steps):
 
 def _diffuse_one_round(G, A, tried_edges):
   activated_nodes_of_this_round = set()
+  catolicos_este_round = set()
+  protestantes_este_round = set()
   cur_tried_edges = set()
+ 
   for s in A:
     for nb in G.successors(s):
       if nb in A or (s, nb) in tried_edges or (s, nb) in cur_tried_edges:
         continue
-      if _prop_success(G, s, nb):
+      (conversion_echa, religion_resultado) = _prop_success(G,s,nb)
+      if conversion_echa and religion_resultado == RELIGION_CATOLICA:
+        activated_nodes_of_this_round.add(nb)
+        catolicos_este_round.add(nb)
+      if conversion_echa and religion_resultado == RELIGION_PROTESTANTE:
+        protestantes_este_round.add(nb)
         activated_nodes_of_this_round.add(nb)
       cur_tried_edges.add((s, nb))
   activated_nodes_of_this_round = list(activated_nodes_of_this_round)
   A.extend(activated_nodes_of_this_round)
   return A, activated_nodes_of_this_round, cur_tried_edges
 
+def validar_semillas(semillas):
+      """
+      Cada semilla debe pertenecer a una religion
+      """
+      for semilla in semillas:
+            if(creyentes[semilla]['religion'] != RELIGION_CATOLICA and creyentes[semilla]['religion'] != RELIGION_PROTESTANTE):
+                  raise "Error: La semilla " +  str(creyentes[semilla]['id']) + "no tiene religion"
+            else:
+                  continue
 
 def cambiarse_a_catolica(nodo):
   creyentes[nodo]['religion'] == RELIGION_CATOLICA
@@ -175,11 +193,12 @@ def _prop_success(G, src, dest):
       random.random() <= creyentes[dest]['grad_percepcion']  ): 
             if(creyentes[src]['religion'] == RELIGION_CATOLICA):
               cambiarse_a_catolica(dest)
+              return True, RELIGION_CATOLICA
             if(creyentes[src]['religion'] == RELIGION_PROTESTANTE):
               cambiarse_a_protestante(dest)
-
-            return True
-
+              return True, RELIGION_PROTESTANTE
+      else:
+            return False, -1
 
 
       
