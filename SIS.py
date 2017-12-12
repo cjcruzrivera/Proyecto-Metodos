@@ -35,9 +35,11 @@ print (time.strftime("%I:%M:%S"))
 NO_RELIGION = 0
 RELIGION_CATOLICA = 1
 RELIGION_PROTESTANTE = 2
-MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 0.7
+MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1.5
 MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE = 1.5
-MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.5
+MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.7
+MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.5
+MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_CATOLICO = 1.0
 
 # Animation funciton
 def animate(i):
@@ -200,9 +202,13 @@ def cambiarse_a_protestante(nodo):
   creyentes[nodo]['grad_percepcion'] =   nuevo_grad_percepcion if nuevo_grad_percepcion <= 1 else 1
 
 def _prop_success(G, src, dest):
+      
+      multiplicador_recistencia_percepcion = MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE if \
+      creyentes[src]['religion'] == RELIGION_PROTESTANTE else MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_CATOLICO
+
       if (random.random() <= G[src][dest]['act_prob']  and 
       random.random() <= creyentes[src]['grad_transferencia'] and 
-      random.random() <= creyentes[dest]['grad_percepcion']  ): 
+      random.random() <= creyentes[dest]['grad_percepcion'] * multiplicador_recistencia_percepcion ): 
             if(creyentes[src]['religion'] == RELIGION_CATOLICA):
               cambiarse_a_catolica(dest)
               return True, RELIGION_CATOLICA
