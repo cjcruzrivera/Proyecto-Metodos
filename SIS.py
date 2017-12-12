@@ -47,7 +47,7 @@ def configuracion_protestantes_poco_perceptivos():
 def configuracion_catolicos_poco_transferentes():
       MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 0.5
 def configuracion_resistencia_contra_protestantes():
-      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.5
+      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.2
 
 def configuracion1():
       configuracion_catolicos_poco_transferentes()
@@ -60,8 +60,16 @@ def configuracion_no_resistencia_contra_protestantes():
 def configuracion_catolicos_transferentes():
       MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1
 
+def configuracion_protestantes_muy_poco_perceptivos():
+  MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.2
+
+def configuracion_mucha_resistencia_contra_protestantes():
+      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.5
+
 def configuracion2():
       configuracion_no_resistencia_contra_protestantes()
+      configuracion_protestantes_muy_poco_perceptivos()
+      configuracion_mucha_resistencia_contra_protestantes()
 
 #configuracion1()
 configuracion2()
@@ -239,7 +247,7 @@ def _prop_success(G, src, dest):
             return False, -1
       if (random.random() <= G[src][dest]['relacion_personas']  and 
       random.random() <= creyentes[src]['grad_transferencia'] and 
-      random.random() <= creyentes[dest]['grad_percepcion']  ): 
+      random.random() <= creyentes[dest]['grad_percepcion'] * MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE ): 
             if(creyentes[src]['religion'] == RELIGION_CATOLICA):
               cambiarse_a_catolica(dest)
               return True, RELIGION_CATOLICA
