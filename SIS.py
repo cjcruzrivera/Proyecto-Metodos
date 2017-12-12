@@ -35,13 +35,36 @@ print (time.strftime("%I:%M:%S"))
 NO_RELIGION = 0
 RELIGION_CATOLICA = 1
 RELIGION_PROTESTANTE = 2
-MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1.5
+MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1
 MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE = 1.5
 MULTIPLICADOR_PERCEPCION_PROTESTANTE = 1
 MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1
-REFUERZO_FE_PROTESTANTE = 0.0
-REFUERZO_FE_CATOLICA = 0.0
 MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_CATOLICO = 1.0
+
+def configuracion_protestantes_poco_perceptivos():
+      MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.5
+
+def configuracion_catolicos_poco_transferentes():
+      MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 0.5
+def configuracion_resistencia_contra_protestantes():
+      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.5
+
+def configuracion1():
+      configuracion_catolicos_poco_transferentes()
+      configuracion_protestantes_poco_perceptivos()
+      configuracion_resistencia_contra_protestantes()
+
+def configuracion_no_resistencia_contra_protestantes():
+      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1
+
+def configuracion_catolicos_transferentes():
+      MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1
+
+def configuracion2():
+      configuracion_no_resistencia_contra_protestantes()
+
+#configuracion1()
+configuracion2()
 
 # Animation funciton
 def animate(i):
@@ -193,8 +216,7 @@ def validar_semillas(semillas):
 def cambiarse_a_catolica(nodo):
   creyentes[nodo]['religion'] = RELIGION_CATOLICA
   if(creyentes[nodo]['religion'] == RELIGION_CATOLICA):
-      creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] + \
-  REFUERZO_FE_CATOLICA
+      creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia']
   else: 
     creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] * \
     MULTIPLICADOR_TRANSFERENCIA_CATOLICA
@@ -203,7 +225,7 @@ def cambiarse_a_protestante(nodo):
   creyentes[nodo]['religion'] = RELIGION_PROTESTANTE
   nuevo_grad_transferencia = creyentes[nodo]['grad_transferencia'] * MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE
   if (creyentes[nodo]['religion'] == RELIGION_PROTESTANTE):
-    nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] + REFUERZO_FE_PROTESTANTE
+    nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] 
   else:
     nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * MULTIPLICADOR_PERCEPCION_PROTESTANTE
   creyentes[nodo]['grad_transferencia'] = nuevo_grad_transferencia if nuevo_grad_transferencia <= 1 else 1 
