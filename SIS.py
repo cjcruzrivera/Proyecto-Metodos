@@ -213,10 +213,11 @@ def _prop_success(G, src, dest):
       
       multiplicador_recistencia_percepcion = MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE if \
       creyentes[src]['religion'] == RELIGION_PROTESTANTE else MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_CATOLICO
-
+      if(creyentes[src]['religion'] == creyentes[dest]['religion']):
+            return False, -1
       if (random.random() <= G[src][dest]['relacion_personas']  and 
       random.random() <= creyentes[src]['grad_transferencia'] and 
-      random.random() <= creyentes[dest]['grad_percepcion'] * multiplicador_recistencia_percepcion ): 
+      random.random() <= creyentes[dest]['grad_percepcion']  ): 
             if(creyentes[src]['religion'] == RELIGION_CATOLICA):
               cambiarse_a_catolica(dest)
               return True, RELIGION_CATOLICA
@@ -344,12 +345,13 @@ def main(argv):
         for node in diffusion[x]:
               if  capas_creyentes[x][node]['religion'] == RELIGION_CATOLICA:
                 nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'b', with_labels=True)
+                plt.draw()
               if capas_creyentes[x][node]['religion'] == RELIGION_PROTESTANTE:
                 nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'r', with_labels=True)
+                plt.draw()
                     
         #nx.draw_networkx_nodes(G, pos, diffusion2[x] , node_size = 250, node_color = 'b', with_labels=True)
         plt.pause(0.5)
-        plt.draw()
     plt.pause(20)
     plt.subplot(2,2,1)
     plt.title('suceptibles')
