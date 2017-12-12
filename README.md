@@ -11,5 +11,10 @@ Formato entrada:
 
 Primera linea:
 
+
+
 *Arcs [Numero de actores]
 [ID Actor] [Etiqueta] [Grado percepcion] [Grado transferencia] [Religion]
+
+
+Colores: Protestantes = Rojos, Catolicos = Azules

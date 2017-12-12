@@ -177,11 +177,11 @@ def validar_semillas(semillas):
                   continue
 
 def cambiarse_a_catolica(nodo):
-  creyentes[nodo]['religion'] == RELIGION_CATOLICA
+  creyentes[nodo]['religion'] = RELIGION_CATOLICA
   creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] * 0.7
   
 def cambiarse_a_protestante(nodo):
-  creyentes[nodo]['religion'] == RELIGION_PROTESTANTE
+  creyentes[nodo]['religion'] = RELIGION_PROTESTANTE
   nuevo_grad_transferencia = creyentes[nodo]['grad_transferencia'] * 1.5
   nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * 1.5
   creyentes[nodo]['grad_transferencia'] = nuevo_grad_transferencia if nuevo_grad_transferencia <= 1 else 1 
@@ -266,8 +266,8 @@ def main(argv):
     inisi = 0
     while inisi == 0: inisi = random.randrange(n)
     print(inisi)
-    diffusion = independent_cascade(G, [4], steps = 0)
-    diffusion2 = independent_cascade(G, [1], steps = 0)
+    diffusion = independent_cascade(G, [4,1], steps = 0)
+    
     print(diffusion)
     print(creyentes)
     print (time.strftime("%I:%M:%S"))
@@ -313,8 +313,14 @@ def main(argv):
         conts = conts + 1
         tics.append(conts)
         #plt.pause(0.001)
-        nx.draw_networkx_nodes(G, pos, diffusion[x] , node_size = 250, node_color = 'r', with_labels=True)
-        nx.draw_networkx_nodes(G, pos, diffusion2[x] , node_size = 250, node_color = 'b', with_labels=True)
+        for node in diffusion[x]:
+              print (creyentes[node]  )
+              if creyentes[node]['religion'] == RELIGION_CATOLICA:
+                nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'b', with_labels=True)
+              if creyentes[node]['religion'] == RELIGION_PROTESTANTE:
+                nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'r', with_labels=True)
+                    
+        #nx.draw_networkx_nodes(G, pos, diffusion2[x] , node_size = 250, node_color = 'b', with_labels=True)
         plt.pause(1)
         plt.draw()
     plt.pause(20)
