@@ -35,12 +35,44 @@ print (time.strftime("%I:%M:%S"))
 NO_RELIGION = 0
 RELIGION_CATOLICA = 1
 RELIGION_PROTESTANTE = 2
-MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1.5
+MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1
 MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE = 1.5
-MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.8
-MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.5
-REFUERZO_FE_PROTESTANTE = 0.05
+MULTIPLICADOR_PERCEPCION_PROTESTANTE = 1
+MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1
 MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_CATOLICO = 1.0
+
+def configuracion_protestantes_poco_perceptivos():
+      MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.5
+
+def configuracion_catolicos_poco_transferentes():
+      MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 0.5
+def configuracion_resistencia_contra_protestantes():
+      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.2
+
+def configuracion1():
+      configuracion_catolicos_poco_transferentes()
+      configuracion_protestantes_poco_perceptivos()
+      configuracion_resistencia_contra_protestantes()
+
+def configuracion_no_resistencia_contra_protestantes():
+      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1
+
+def configuracion_catolicos_transferentes():
+      MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1
+
+def configuracion_protestantes_muy_poco_perceptivos():
+  MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.2
+
+def configuracion_mucha_resistencia_contra_protestantes():
+      MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.5
+
+def configuracion2():
+      configuracion_no_resistencia_contra_protestantes()
+      configuracion_protestantes_muy_poco_perceptivos()
+      configuracion_mucha_resistencia_contra_protestantes()
+
+configuracion1()
+#configuracion2()
 
 # Animation funciton
 def animate(i):
@@ -80,7 +112,7 @@ def independent_cascade(G, seeds, steps=0):
   --------
   >>> DG = nx.DiGraph()
   >>> DG.add_edges_from([(1,2), (1,3), (1,5), (2,1), (3,2), (4,2), (4,3), \
-  >>>   (4,6), (5,3), (5,4), (5,6), (6,4), (6,5)], act_prob=0.2)
+  >>>   (4,6), (5,3), (5,4), (5,6), (6,4), (6,5)], relacion_personas=0.2)
   >>> H = nx.independent_cascade(DG,[6])
 
   References
@@ -106,12 +138,12 @@ def independent_cascade(G, seeds, steps=0):
 
   # init activation probabilities
   for e in DG.edges():
-    if 'act_prob' not in DG[e[0]][e[1]]:
-      DG[e[0]][e[1]]['act_prob'] = 1
+    if 'relacion_personas' not in DG[e[0]][e[1]]:
+      DG[e[0]][e[1]]['relacion_personas'] = 1
       
-    elif DG[e[0]][e[1]]['act_prob'] >  1:
+    elif DG[e[0]][e[1]]['relacion_personas'] >  1:
       raise Exception("edge activation probability:", \
-          DG[e[0]][e[1]]['act_prob'], "cannot be larger than 1")
+          DG[e[0]][e[1]]['relacion_personas'], "cannot be larger than 1")
 
   # perform diffusion
   A = copy.deepcopy(seeds)  # prevent side effect
@@ -134,9 +166,8 @@ def _diffuse_all(G, A):
         _diffuse_one_round(G, A, tried_edges)
     layer_i_nodes.append(activated_nodes_of_this_round)
     capas_creyentes.append(copy.deepcopy(creyentes))
-    tried_edges = tried_edges.union(cur_tried_edges)
-    if len(A) == len_old:
-      break
+    #if len(A) == len_old:
+    #  break
   return layer_i_nodes
 
 def _diffuse_k_rounds(G, A, steps):
@@ -166,8 +197,8 @@ def _diffuse_one_round(G, A, tried_edges):
   for s in A:
     for nb in G.successors(s):
       #if nb in A or (s, nb) in tried_edges or (s, nb) in cur_tried_edges:
-      if  (s, nb) in cur_tried_edges:
-        continue
+      #if  (s, nb) in cur_tried_edges:
+      #  continue
       (conversion_echa, religion_resultado) = _prop_success(G,s,nb)
       if conversion_echa and religion_resultado == RELIGION_CATOLICA:
         activated_nodes_of_this_round.add(nb)
@@ -192,14 +223,17 @@ def validar_semillas(semillas):
 
 def cambiarse_a_catolica(nodo):
   creyentes[nodo]['religion'] = RELIGION_CATOLICA
-  creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] * \
-  MULTIPLICADOR_TRANSFERENCIA_CATOLICA
+  if(creyentes[nodo]['religion'] == RELIGION_CATOLICA):
+      creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia']
+  else: 
+    creyentes[nodo]['grad_transferencia'] =  creyentes[nodo]['grad_transferencia'] * \
+    MULTIPLICADOR_TRANSFERENCIA_CATOLICA
   
 def cambiarse_a_protestante(nodo):
   creyentes[nodo]['religion'] = RELIGION_PROTESTANTE
   nuevo_grad_transferencia = creyentes[nodo]['grad_transferencia'] * MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE
   if (creyentes[nodo]['religion'] == RELIGION_PROTESTANTE):
-    nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] + REFUERZO_FE_PROTESTANTE
+    nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] 
   else:
     nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * MULTIPLICADOR_PERCEPCION_PROTESTANTE
   creyentes[nodo]['grad_transferencia'] = nuevo_grad_transferencia if nuevo_grad_transferencia <= 1 else 1 
@@ -209,10 +243,11 @@ def _prop_success(G, src, dest):
       
       multiplicador_recistencia_percepcion = MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE if \
       creyentes[src]['religion'] == RELIGION_PROTESTANTE else MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_CATOLICO
-
-      if (random.random() <= G[src][dest]['act_prob']  and 
+      if(creyentes[src]['religion'] == creyentes[dest]['religion']):
+            return False, -1
+      if (random.random() <= G[src][dest]['relacion_personas']  and 
       random.random() <= creyentes[src]['grad_transferencia'] and 
-      random.random() <= creyentes[dest]['grad_percepcion'] * multiplicador_recistencia_percepcion ): 
+      random.random() <= creyentes[dest]['grad_percepcion'] * MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE ): 
             if(creyentes[src]['religion'] == RELIGION_CATOLICA):
               cambiarse_a_catolica(dest)
               return True, RELIGION_CATOLICA
@@ -262,7 +297,7 @@ def buildG(G, file_, delimiter_):
            if len(line) >  2:
               if float(line[2]) != 0.0:
                 #line format: u,v,w
-                G.add_edge(int(line[0]),int(line[1]),act_prob=float(line[2]))
+                G.add_edge(int(line[0]),int(line[1]),relacion_personas=float(line[2]))
            else:
             #line format: u,v
                G.add_edge(int(line[0]),int(line[1]),weight=1.0)
@@ -288,6 +323,7 @@ def main(argv):
     inisi = 0
     while inisi == 0: inisi = random.randrange(n)
     print(inisi)
+
     diffusion = independent_cascade(G, [4,1], steps = 55)
     
     print(diffusion)
@@ -337,15 +373,15 @@ def main(argv):
         tics.append(conts)
         #plt.pause(0.001)
         for node in diffusion[x]:
-              print (creyentes[node]  )
               if  capas_creyentes[x][node]['religion'] == RELIGION_CATOLICA:
                 nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'b', with_labels=True)
+                plt.draw()
               if capas_creyentes[x][node]['religion'] == RELIGION_PROTESTANTE:
                 nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'r', with_labels=True)
+                plt.draw()
                     
         #nx.draw_networkx_nodes(G, pos, diffusion2[x] , node_size = 250, node_color = 'b', with_labels=True)
         plt.pause(0.5)
-        plt.draw()
     plt.pause(20)
     plt.subplot(2,2,1)
     plt.title('suceptibles')
