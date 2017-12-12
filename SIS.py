@@ -37,8 +37,9 @@ RELIGION_CATOLICA = 1
 RELIGION_PROTESTANTE = 2
 MULTIPLICADOR_TRANSFERENCIA_CATOLICA = 1.5
 MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE = 1.5
-MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.7
+MULTIPLICADOR_PERCEPCION_PROTESTANTE = 0.8
 MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_PROTESTANTE = 1.5
+REFUERZO_FE_PROTESTANTE = 0.05
 MULTIPLICADOR_RESISTENCIA_A_CONVERTIRSE_CATOLICO = 1.0
 
 # Animation funciton
@@ -197,7 +198,10 @@ def cambiarse_a_catolica(nodo):
 def cambiarse_a_protestante(nodo):
   creyentes[nodo]['religion'] = RELIGION_PROTESTANTE
   nuevo_grad_transferencia = creyentes[nodo]['grad_transferencia'] * MULTIPLICADOR_TRANSFERENCIA_PROTESTANTE
-  nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * MULTIPLICADOR_PERCEPCION_PROTESTANTE
+  if (creyentes[nodo]['religion'] == RELIGION_PROTESTANTE):
+    nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] + REFUERZO_FE_PROTESTANTE
+  else:
+    nuevo_grad_percepcion = creyentes[nodo]['grad_percepcion'] * MULTIPLICADOR_PERCEPCION_PROTESTANTE
   creyentes[nodo]['grad_transferencia'] = nuevo_grad_transferencia if nuevo_grad_transferencia <= 1 else 1 
   creyentes[nodo]['grad_percepcion'] =   nuevo_grad_percepcion if nuevo_grad_percepcion <= 1 else 1
 
