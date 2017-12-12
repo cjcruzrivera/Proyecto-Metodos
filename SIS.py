@@ -115,15 +115,19 @@ def independent_cascade(G, seeds, steps=0):
   # perform diffusion for at most "steps" rounds
   return _diffuse_k_rounds(DG, A, steps)
 
+
+capas_creyentes = []
 def _diffuse_all(G, A):
   tried_edges = set()
   layer_i_nodes = [ ]
   layer_i_nodes.append([i for i in A])  # prevent side effect
+  capas_creyentes.append(copy.deepcopy(creyentes))
   while True:
     len_old = len(A)
     (A, activated_nodes_of_this_round, cur_tried_edges) = \
         _diffuse_one_round(G, A, tried_edges)
     layer_i_nodes.append(activated_nodes_of_this_round)
+    capas_creyentes.append(copy.deepcopy(creyentes))
     tried_edges = tried_edges.union(cur_tried_edges)
     if len(A) == len_old:
       break
@@ -133,14 +137,17 @@ def _diffuse_k_rounds(G, A, steps):
   tried_edges = set()
   layer_i_nodes = [ ]
   layer_i_nodes.append([i for i in A])
-  while steps > 0 and len(A) < len(G):
+  capas_creyentes.append(copy.deepcopy(creyentes))
+  #while steps > 0 and len(A) < len(G):
+  while steps > 0 :
     len_old = len(A)
     (A, activated_nodes_of_this_round, cur_tried_edges) = \
         _diffuse_one_round(G, A, tried_edges)
     layer_i_nodes.append(activated_nodes_of_this_round)
+    capas_creyentes.append(copy.deepcopy(creyentes))
     tried_edges = tried_edges.union(cur_tried_edges)
-    if len(A) == len_old:
-      break
+    #if len(A) == len_old:
+     # break
     steps -= 1
   return layer_i_nodes
 
@@ -152,7 +159,8 @@ def _diffuse_one_round(G, A, tried_edges):
  
   for s in A:
     for nb in G.successors(s):
-      if nb in A or (s, nb) in tried_edges or (s, nb) in cur_tried_edges:
+      #if nb in A or (s, nb) in tried_edges or (s, nb) in cur_tried_edges:
+      if  (s, nb) in cur_tried_edges:
         continue
       (conversion_echa, religion_resultado) = _prop_success(G,s,nb)
       if conversion_echa and religion_resultado == RELIGION_CATOLICA:
@@ -266,7 +274,7 @@ def main(argv):
     inisi = 0
     while inisi == 0: inisi = random.randrange(n)
     print(inisi)
-    diffusion = independent_cascade(G, [4,1], steps = 0)
+    diffusion = independent_cascade(G, [4,1], steps = 55)
     
     print(diffusion)
     print(creyentes)
@@ -304,6 +312,7 @@ def main(argv):
     infect.append(infectados)
     sucep.append(sanos)
     tics.append(conts)
+    print(str(len(capas_creyentes)) + "vs " + str(len(diffusion)) )
     for x in range ( 0, len(diffusion)):
         #print(i)
         infectados = infectados + len(diffusion[x])
@@ -315,13 +324,13 @@ def main(argv):
         #plt.pause(0.001)
         for node in diffusion[x]:
               print (creyentes[node]  )
-              if creyentes[node]['religion'] == RELIGION_CATOLICA:
+              if  capas_creyentes[x][node]['religion'] == RELIGION_CATOLICA:
                 nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'b', with_labels=True)
-              if creyentes[node]['religion'] == RELIGION_PROTESTANTE:
+              if capas_creyentes[x][node]['religion'] == RELIGION_PROTESTANTE:
                 nx.draw_networkx_nodes(G, pos, [node] , node_size = 250, node_color = 'r', with_labels=True)
                     
         #nx.draw_networkx_nodes(G, pos, diffusion2[x] , node_size = 250, node_color = 'b', with_labels=True)
-        plt.pause(1)
+        plt.pause(0.5)
         plt.draw()
     plt.pause(20)
     plt.subplot(2,2,1)
